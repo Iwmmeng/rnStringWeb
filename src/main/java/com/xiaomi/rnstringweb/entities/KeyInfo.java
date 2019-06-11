@@ -1,15 +1,10 @@
 package com.xiaomi.rnstringweb.entities;
 
-import javafx.scene.input.DataFormat;
 import org.json.JSONObject;
-import org.springframework.data.annotation.Id;
-import org.springframework.lang.Nullable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.IdClass;
+import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -17,40 +12,31 @@ import java.util.Date;
 public class KeyInfo {
     @Id
     private String keyName;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String deValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String ruValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String koValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String enValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String itValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String frValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String plValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String zhValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String esValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String zh_HantValue;
-    @Column(length = 255)
+    @Column(length = 255,nullable = false)
     private String fileName;
-    @Column
-    private Date createTime;
+//    @Column
+//    private Date createTime;
 
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public KeyInfo setCreateTime(Date createTime) {
-        this.createTime = createTime;
-        return this;
-    }
 
     public String getFileName() {
         return fileName;
