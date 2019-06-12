@@ -48,6 +48,13 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.47</version>
+		</dependency>
+
 		<!-- Spring-data-jpa依赖 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -83,6 +90,22 @@
 			<groupId>org.slf4j</groupId> <!-- 桥接：log4j1使用Log4j2 也支持其他实现到log4j的桥接，引入不同的jar包即可-->
 			<artifactId>log4j-over-slf4j</artifactId>
 			<version>1.7.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20090211</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.12</version>
 		</dependency>
 
 
