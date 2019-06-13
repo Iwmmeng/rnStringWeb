@@ -56,7 +56,9 @@ public class KeyInfo {
 //    @Column
 //    private Date createTime;
 
-
+    public Integer getId() {
+        return id;
+    }
     public String getFileName() {
         return fileName;
     }
