@@ -18,9 +18,10 @@ import java.util.Map;
 
 public class StringsHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringsHelper.class);
+
     public static String parseInputStreamToString(InputStream inputStream) throws IOException {
         String fileStringResult = null;
-        InputStreamReader isReader = new InputStreamReader(inputStream,"UTF-8");
+        InputStreamReader isReader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader reader = new BufferedReader(isReader);
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -30,7 +31,7 @@ public class StringsHelper {
             } else if (line.startsWith("import")) {
                 line = "";
             } else if (line.indexOf(":") > 0 && (!line.trim().startsWith("\""))) {
-                line = ("\"" + line.trim().replaceFirst(":", "\":").trim()).replace("\u00a0", "").replace("\\n","");
+                line = ("\"" + line.trim().replaceFirst(":", "\":").trim()).replace("\u00a0", "").replace("\\n", "");
             }
             sb.append(line.trim());
         }
@@ -40,19 +41,35 @@ public class StringsHelper {
         return fileStringResult;
     }
 
-    //把正文文件分为strings和zh_Hant两种格式，用list存储，对于含有zhHant格式的
-    public static void convertStringFileToListFile(List stringsList, List zhHantList, String fileStringResult, Map<String, Integer> exportStringsMap) {
+    public static List<String> getStringsList(String fileStringResult) {
+        List<String> stringsList = new ArrayList<>();
         if (fileStringResult != null) {
             String stringExport = fileStringResult.substring(fileStringResult.indexOf("export"));
-            int stringCount = StringUtils.countMatches(stringExport, "string");
-            exportStringsMap.put("stringsExport", stringCount);
             String constString = StringUtils.remove(fileStringResult, stringExport);
             String[] constStringArr = constString.split("const");
             for (int i = 0; i < constStringArr.length; i++) {
                 if (constStringArr[i].contains("string")) {
                     String subConst = constStringArr[i].substring(constStringArr[i].indexOf("({"), constStringArr[i].indexOf("});")).replace("({", "").trim();
                     stringsList.add(subConst);
-                } else if (constStringArr[i].contains("zh_Hant")) {
+                } else {
+                    LOGGER.info("the const str is not wanted: {}", constStringArr[i]);
+                }
+            }
+            LOGGER.info("stringsList is {}", stringsList);
+        } else {
+            LOGGER.error("input strings is null");
+        }
+        return stringsList;
+    }
+
+    public static List<String> getZhHantList(String fileStringResult) {
+        List<String> zhHantList = new ArrayList<>();
+        if (fileStringResult != null) {
+            String stringExport = fileStringResult.substring(fileStringResult.indexOf("export"));
+            String constString = StringUtils.remove(fileStringResult, stringExport);
+            String[] constStringArr = constString.split("const");
+            for (int i = 0; i < constStringArr.length; i++) {
+                if (constStringArr[i].contains("zh_Hant")) {
                     String zh_Hant = constStringArr[i].substring(constStringArr[i].indexOf("zh_Hant"), constStringArr[i].indexOf("};")).trim();
                     if (zh_Hant.endsWith(",")) {
                         StringUtils.reverse(zh_Hant).replaceFirst(",", "");
@@ -64,13 +81,27 @@ public class StringsHelper {
                     LOGGER.error("this const is not wanted");
                 }
             }
-            LOGGER.info("stringsList is {}", stringsList);
             LOGGER.info("zhHantList is {}", zhHantList);
 
         } else {
             LOGGER.error("input strings is null");
         }
+        return zhHantList;
+
+
     }
+    public static Map<String,Integer> getExportString(String fileStringResult){
+        Map<String,Integer> exportStringsMap = new HashMap<>();
+        if (fileStringResult != null) {
+            String stringExport = fileStringResult.substring(fileStringResult.indexOf("export"));
+            int stringCount = StringUtils.countMatches(stringExport, "string");
+            exportStringsMap.put("stringsExport", stringCount);
+        }else {
+            LOGGER.error("input strings is null");
+        }
+        return exportStringsMap;
+    }
+
     //对strings里面的含有大括号的结构进行处理，存到list
     public static List parseStringToList(String originStrings) {
         List foreignList = new ArrayList();
@@ -102,17 +133,18 @@ public class StringsHelper {
         }
         return foreignList;
     }
+
     //  对strings的整体结构进行处理（包含直接引用和间接引用），存到JSONObject和map里面去
     public static Map parseStringsToMap(List foreignList, Map<String, JSONObject> stringsMap, String zhHant) throws JSONException {
         if (foreignList != null) {
             for (int m = 0; m < foreignList.size(); m++) {
 //                JSONObject jsonObject = new JSONObject();
                 String foreignString = foreignList.get(m).toString();
-                LOGGER.info("foreignString is {}",foreignString);
+                LOGGER.info("foreignString is {}", foreignString);
                 //取地域
                 String mapKey = foreignString.substring(0, foreignString.indexOf(":{")).replace("\"", "").trim();
                 String valueString = foreignString.substring(foreignString.indexOf(":{")).replaceFirst(":", "").trim();
-                LOGGER.info("valueString is {}",valueString);
+                LOGGER.info("valueString is {}", valueString);
 //                JSONObject mapObject = JSONObject.parseObject(valueString);
                 JSONObject mapObject = new JSONObject(valueString);
                 stringsMap.put(mapKey, mapObject);
@@ -121,6 +153,7 @@ public class StringsHelper {
             LOGGER.info("input List foreignList is null");
         }
         if (zhHant != null) {
+            LOGGER.info("zhHant is {}",zhHant);
             String key = zhHant.substring(zhHant.indexOf("zh_Hant"), zhHant.indexOf("=")).replace("\"", "").trim();
             String valueString = zhHant.substring(zhHant.indexOf("{")).trim();
             JSONObject jsonObject = new JSONObject(valueString);
@@ -130,33 +163,56 @@ public class StringsHelper {
         }
         return stringsMap;
     }
-    public static void  convertStringAndZhhantToMap(List zhHantList, List stringsList, List mapList, Map<String, Integer> exportStringsMap) throws JSONException {
+
+    public static List<Map<String,JSONObject>> getResultMapList(String fileStringResult) throws JSONException {
+        List<Map<String,JSONObject>> mapList = new ArrayList<>();
+        Map<String, Integer> exportStringsMap = StringsHelper.getExportString(fileStringResult);
+        List stringsList = StringsHelper.getStringsList(fileStringResult);
+        List zhHantList = StringsHelper.getZhHantList(fileStringResult);
         if (zhHantList.size() == stringsList.size() && stringsList.size() == exportStringsMap.get("stringsExport")) {
             for (int t = 0; t < stringsList.size(); t++) {
                 Map<String, JSONObject> stringsMap = new HashMap();
                 String strSub = stringsList.get(t).toString();
                 String zhHant = zhHantList.get(t).toString();
                 List foreignList = StringsHelper.parseStringToList(strSub);
+                LOGGER.info("zhHant is {}",zhHant);
+                LOGGER.info("foreignList is {}",foreignList);
                 StringsHelper.parseStringsToMap(foreignList, stringsMap, zhHant);
                 mapList.add(stringsMap);
             }
         } else {
             LOGGER.error("文件的格式不对称");
         }
+        return mapList;
     }
+//    public static void convertStringAndZhhantToMap(List zhHantList, List stringsList, List mapList, Map<String, Integer> exportStringsMap) throws JSONException {
+//        if (zhHantList.size() == stringsList.size() && stringsList.size() == exportStringsMap.get("stringsExport")) {
+//            for (int t = 0; t < stringsList.size(); t++) {
+//                Map<String, JSONObject> stringsMap = new HashMap();
+//                String strSub = stringsList.get(t).toString();
+//                String zhHant = zhHantList.get(t).toString();
+//                List foreignList = StringsHelper.parseStringToList(strSub);
+//                StringsHelper.parseStringsToMap(foreignList, stringsMap, zhHant);
+//                mapList.add(stringsMap);
+//            }
+//        } else {
+//            LOGGER.error("文件的格式不对称");
+//        }
+//    }
+
     //MHLocalizableStrings 产品，对string进行处理，提取符合要求的base串，提取key提取json串
-    public static Map<String,JSONObject> parseStringBaseToMap(String fileStringResult) throws JSONException {
+    public static Map<String, JSONObject> parseStringBaseToMap(String fileStringResult) throws JSONException {
 //        List<JSONObject> baseJsonList = new ArrayList<JSONObject>();
-        Map<String,JSONObject> stringMap = new HashMap<String, JSONObject>();
+        Map<String, JSONObject> stringMap = new HashMap<String, JSONObject>();
         String start = fileStringResult.substring(fileStringResult.indexOf("const"), fileStringResult.indexOf("export")).trim();
         String[] strArr = start.split("const ");
         for (String str : strArr) {
             if (str.contains("= {")) {
                 String baseKey = str.substring(0, str.indexOf("=")).trim();
                 if (StringUtils.containsAny(baseKey, "deBase", "itBase", "frBase", "ruBase", "esBase", "zhBase", "twhkBase", "enBase")) {
-                    baseKey = baseKey.substring(0,baseKey.indexOf("Base"));
-                    if(baseKey.contains("tw")){
-                        baseKey="zh_Hant";
+                    baseKey = baseKey.substring(0, baseKey.indexOf("Base"));
+                    if (baseKey.contains("tw")) {
+                        baseKey = "zh_Hant";
                     }
                     int begin = str.indexOf("=");
                     int end = str.indexOf("};");
@@ -166,7 +222,7 @@ public class StringsHelper {
                     }
                     baseMapValue = baseMapValue + "}";
                     JSONObject baseObject = new JSONObject(baseMapValue);
-                    stringMap.put(baseKey,baseObject);
+                    stringMap.put(baseKey, baseObject);
                 } else {
                     LOGGER.info("current str is not match");
                 }
@@ -174,11 +230,12 @@ public class StringsHelper {
                 LOGGER.info("this current str is null，continue");
             }
         }
-        for(Map.Entry<String,JSONObject> entry:stringMap.entrySet()) {
-            LOGGER.info("key is {},value is {}",entry.getKey(),entry.getValue());
+        for (Map.Entry<String, JSONObject> entry : stringMap.entrySet()) {
+            LOGGER.info("key is {},value is {}", entry.getKey(), entry.getValue());
         }
         return stringMap;
     }
+
     //用于提取export后面的内容，主要用于空净产品
     public static JSONObject parseStringsToJson(String fileStringResult) throws JSONException {
         if (fileStringResult != null && fileStringResult.contains("{")) {
@@ -201,11 +258,6 @@ public class StringsHelper {
         }
         return null;
     }
-
-
-
-
-
 
 
 }
