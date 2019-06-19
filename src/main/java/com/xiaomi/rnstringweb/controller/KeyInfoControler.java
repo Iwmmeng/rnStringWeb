@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -141,7 +143,9 @@ public class KeyInfoControler {
             }
             File reportFile =  new File(basePath);
             List<File> reportFileList = new ArrayList<>();
-            ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"xlsx","txt");
+//            ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"xlsx","txt");
+            ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"","");
+
             ExportExcelHelper.downLoadFiles(reportFileList,response);
 
             return "process success!";
@@ -163,6 +167,43 @@ public class KeyInfoControler {
         LOGGER.info("keyInfo", keyInfoList);
         return keyInfoList;
     }
+    @RequestMapping(value = "/info/fileName", method = RequestMethod.GET)
+    public List<KeyInfo> getInfoByKeyName(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product,@RequestParam(value = "fileName") String fileName) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, product,fileName);
+        LOGGER.info("keyInfo", keyInfoList);
+        return keyInfoList;
+    }
+
+
+
+    @RequestMapping(value = "/greet1", method = RequestMethod.GET)
+    public ModelAndView loginPage(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String productName,@RequestParam(value = "fileName") String fileName) {
+//        public String index(Model model){
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("greet1");
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, productName, fileName);
+        mav.addObject("info", keyInfoList);
+        return mav;
+//        Student students = ssi.findStudentById(201713140001);
+//            model.addAttribute("s",students);
+//            return "greet";
+    }
+
+        @RequestMapping(value = "/greet", method = RequestMethod.GET)
+        public ModelAndView greet() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("greet");
+        return mav;
+//
+        }
+
+
+
+
+
+
+
+
 
     @Test
     public void getPath() throws FileNotFoundException {

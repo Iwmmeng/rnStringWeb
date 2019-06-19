@@ -103,7 +103,7 @@ public class ExportExcelHelper {
             // 创建一个临时压缩文件
             // 临时文件可以放在CDEF盘中，但不建议这么做，因为需要先设置磁盘的访问权限，最好是放在服务器上，方法最后有删除临时文件的步骤
 //            String zipFilename = "D:/tempFile.zip";
-            String zipFilename = "/Users/huamiumiu/Miot/workCode/rnStringWeb/target/classes/static/report/tempFile.zip";
+            String zipFilename = "/Users/huamiumiu/Miot/workCode/rnStringWeb/target/classes/static/report/resultFile.zip";
             File file = new File(zipFilename);
             file.createNewFile();
 //            if (!file.exists()) {
@@ -188,6 +188,7 @@ public class ExportExcelHelper {
                 // 如果输出的是中文名的文件，在此处就要用URLEncoder.encode方法进行处理，+ new String(file.getName().getBytes("GB2312"), "ISO8859-1")
                 response.setHeader("Content-Disposition",
                         "attachment;filename=tempFile.zip" );
+                response.addHeader("Access-Control-Allow-Origin", "*");
                 toClient.write(buffer);
                 toClient.flush();
                 toClient.close();
@@ -213,11 +214,30 @@ public class ExportExcelHelper {
         if (!report.exists()) {
             report.mkdirs();
         }else{
-            report.delete();
+            Boolean isDelete = deleteDir(report);
+            System.out.println("delete report dir is: " + isDelete);
             report.mkdirs();
+            System.out.println("create report dir again");
         }
+        System.out.println("report path is "+report);
         return report.getAbsolutePath();
     }
+
+    private static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            //递归删除目录中的子目录下
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // 目录此时为空，可以删除
+        return dir.delete();
+    }
+
 
     @RequestMapping("/downlo")
     public void downLoad(HttpServletResponse response) {

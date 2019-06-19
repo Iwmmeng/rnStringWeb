@@ -14,6 +14,7 @@ public interface KeyInfoRepository extends JpaRepository<KeyInfo,Integer>{
 //    @Override
     List<KeyInfo> findByKeyName(String keyName);
     List<KeyInfo> findByKeyNameAndProduct(String keyName,String product);
+    List<KeyInfo> findByKeyNameAndProductAndFileName(String keyName,String product,String filrName);
 
 
 

@@ -10,4 +10,6 @@ public class RnstringwebApplication {
 		SpringApplication.run(RnstringwebApplication.class, args);
 	}
 
+
+
 }
