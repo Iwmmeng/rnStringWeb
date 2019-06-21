@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Bootstrap 实例</title>
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="/js/findByAll8.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap-table.js"></script>
+    <script src="/js/bootstrap-table-zh-CN.js"></script>
+</head>
+<body ms-controller="viewmodel">
+<h3>按照条件查询</h3>
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text">请输入</span>
+    </div>
+    <input type="text" class="form-control" placeholder="Key Name" id="keyName">
+    <input type="text" class="form-control" placeholder="File Name" id="fileName">
+    <!--<input type="text" class="form-control" placeholder="Product Name" id="productName">-->
+    <select id="mySelect" onchange="selectChange()">
+        <option>select productName</option>
+    </select>
+    <input type="submit" class="btn btn-info" value="搜索" id="btSearch">
+    <script type="text/javascript">
+        function getProduct() {
+            $.ajax({
+                type: "get",
+                url: "http://10.234.22.110:9090/info/productlist",//访问后台去数据库查询select的选项
+                success: function (productList) {
+                    var option;
+                    option = "<option>select productName</option>";
+                    $.each(productList, function (i, n) {//循环，i为下标从0开始，n为集合中对应的第i个对象
+                        option += "<option>" + n + "</option>"
+                    });
+                    $("#mySelect").html(option);//将循环拼接的字符串插入第二个下拉列表
+//                    $("#mySelect").show();//把第二个下拉列表展示
+                }
+            })
+        }
+        getProduct();
+        function selectChange(e){
+            console.log(e);
+        }
+    </script>
+</div>
+
+<h3>查询结果</h3>
+<!--<p>通过添加 .table-striped 类，来设置条纹表格:</p>-->
+<div class="tableArea ">
+    <table class="table table-striped" id="table" data-height="600">
+        <!--在此处填充表格数据-->
+        <!--<thead id="thead">-->
+        <!--</thead>-->
+        <tbody id="tbody-result">
+        </tbody>
+    </table>
+</div>
+
+

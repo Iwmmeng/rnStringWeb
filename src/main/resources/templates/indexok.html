@@ -2,35 +2,37 @@
 <html>
 <head>
     <title>Getting Started: Serving Web Content</title>
-    <meta http-equiv="Access-Control-Allow-Origin" content="*" charset="UTF-8" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" charset="UTF-8"/>
 </head>
 <body>
-<input type="file" id="file" name="myfile"/>
+<input type="file" id="file" multiple="multiple" name="myfile"/>
 <input type="button" onclick="UpladFile()" value="上传"/>
-<input type="button" onclick="cancleUploadFile()" value="取消"/>
+<!--<input type="button" onclick="cancleUploadFile()" value="取消"/>-->
 <script type="text/javascript">
     //上传文件方法
     function UpladFile() {
         var xhr = new XMLHttpRequest();  // XMLHttpRequest 对象;
-//            var oReq = new XMLHttpRequest();
-
-        var fileObj = document.getElementById("file").files[0]; // js 获取文件对象
-        var url = "http://10.234.22.110:9090/upload"; // 接收上传文件的后台地址
         var form = new FormData(); // FormData 对象
-        form.append("file", fileObj); // 文件对象
+        var fileObj = document.getElementById("file").files; // js 获取文件对象
+        var fileSize = fileObj.length;
+        var file;
+        for (var i = 0; i < fileSize; i++) {
+            file = fileObj[i];
+            form.append("file", file); // 文件对象
+        }
+        console.log("fileObj is  " + fileObj.size);
+        var url = "http://10.234.22.110:9090/upload"; // 接收上传文件的后台地址
         xhr.open("post", url, true); //post方式，url为服务器请求地址，true 该参数规定请求是否异步处理。
-//                xhr.send(form); //开始上传，发送form数据
-        xhr.send(form);
+        xhr.send(form); //开始上传，发送form数据
 
-//            oReq.open("post", "/Users/huamiumiu/Miot/workCode/rnStringWeb/target/classes/static/report/tempFile.zip", true);
+
+        console.log("upload complete");
         xhr.responseType = "blob";
-        console.log("=====begin");
-
         xhr.onload = function (oEvent) {
             console.log("=====begin 1");
             var content = xhr.response;
             var elink = document.createElement('a');
-            elink.download = filename;
+            elink.download = "resultFile.zip";
             elink.style.display = 'none';
             var blob = new Blob([content]);
             elink.href = URL.createObjectURL(blob);
@@ -43,6 +45,5 @@
         console.log("=====begin 2");
     }
 </script>
-<!--<p>Get your greeting <a href="/greet">here</a></p>-->
 </body>
 </html>

@@ -58,7 +58,7 @@ public class KeyInfoControler {
     //todo 1. 每次上传的都是同一产品的文件 2.product 的命名  3.HttpServletResponse response 这个要怎么使用？？？
     //上传上来的文件，做处理
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam(value = "file") MultipartFile file[], HttpServletResponse response) throws Exception {
+    public String upload(@RequestParam(value = "file") MultipartFile file[], @RequestParam(value = "product") String product,HttpServletResponse response) throws Exception {
         Map<String, JSONObject> stringsMap = new HashMap<String, JSONObject>();
         Map<String, HashMap<String, JSONObject>> failResultsOfAllMaps = new HashMap<String, HashMap<String, JSONObject>>();
         String basePath = ExportExcelHelper.createReportDir()+"/";
@@ -69,7 +69,7 @@ public class KeyInfoControler {
         String failResultPath = basePath + "failResult.txt";
         System.out.println(failResultPath);
         String fileName = "";
-        String product = "";
+//        String product = "";
         if (file.length != 0) {
             for (int i = 0; i < file.length; i++) {
                 fileName = file[i].getOriginalFilename();
@@ -79,7 +79,7 @@ public class KeyInfoControler {
                 Boolean flag = StringUtils.containsAny(fileName, "EN.js", "TW.js", "DE.js", "ES.js", "IT.js", "ZH.js", "FR.js", "RU.js");
                 if (flag) {
                     //空气净化器产品的入口（一个文件一个国家，不同文件的的key不一样，有多个文件）
-                    product = "空气净化器pro";
+//                    product = "空气净化器pro";
                     String countryCode;
                     if (fileName.contains("TW")) {
                         countryCode = "zh_Hant";
@@ -91,14 +91,14 @@ public class KeyInfoControler {
                 } else {
                     if (fileName.contains("String")) {
                         //MHLocalizableString产品，一个文件里面有多组base，且每组的key都不太一致
-                        product = "一个文件含多组base产品";
+//                        product = "一个文件含多组base产品";
                         stringsMap = StringsHelper.parseStringBaseToMap(fileStringResult);
 //                        ExportExcelHelper.exportExcel(response,fileName,stringsMap);
                         List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
                         resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
                     } else {
                         //一个文件夹下多组产品的逻辑
-                        product = "多个文件产品";
+//                        product = "多个文件产品";
                         String zh = "zh";
                         String en = "en";
                         String outputPath = (basePath + fileName.replace(".js", ""));
@@ -145,7 +145,6 @@ public class KeyInfoControler {
             List<File> reportFileList = new ArrayList<>();
 //            ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"xlsx","txt");
             ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"","");
-
             ExportExcelHelper.downLoadFiles(reportFileList,response);
 
             return "process success!";
@@ -162,17 +161,39 @@ public class KeyInfoControler {
     }
 
     @RequestMapping(value = "/info/product", method = RequestMethod.GET)
-    public List<KeyInfo> getInfoByKeyName(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product) {
+    public List<KeyInfo> getInfoByKeyNameAndProduct(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product) {
         List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProduct(keyName, product);
-        LOGGER.info("keyInfo", keyInfoList);
+        LOGGER.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
     @RequestMapping(value = "/info/fileName", method = RequestMethod.GET)
-    public List<KeyInfo> getInfoByKeyName(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product,@RequestParam(value = "fileName") String fileName) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, product,fileName);
-        LOGGER.info("keyInfo", keyInfoList);
+    public List<KeyInfo> getInfoByKeyNameAndFileName(@RequestParam(value = "keyName") String keyName,@RequestParam(value = "fileName") String fileName) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndFileName(keyName,fileName);
+        LOGGER.info("keyInfo {} ", keyInfoList);
         return keyInfoList;
     }
+    @RequestMapping(value = "/info/all", method = RequestMethod.GET)
+    public List<KeyInfo> getInfoByAllParams(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product,@RequestParam(value = "fileName") String fileName) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, product,fileName);
+        LOGGER.info("keyInfo {} ", keyInfoList);
+        return keyInfoList;
+    }
+
+
+    @RequestMapping(value = "/info/productlist", method = RequestMethod.GET)
+    public List<String> getProductList() {
+        List<String> productList = keyInfoRepository.findProductList();
+        LOGGER.info("productList {}", productList);
+        return productList;
+    }
+//    @RequestMapping(value = "/info/columns", method = RequestMethod.GET)
+//    public List<String> getColumnsList() {
+//        List<String> columnsList = keyInfoRepository.getColumns();
+//        LOGGER.info("columnsList {}", columnsList);
+//        return columnsList;
+//    }
+
+
 
 
 
@@ -194,8 +215,32 @@ public class KeyInfoControler {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("greet");
         return mav;
-//
         }
+    @RequestMapping(value = "/greet2", method = RequestMethod.GET)
+    public ModelAndView greet2() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("greet2");
+        return mav;
+    }
+    @RequestMapping(value = "/greet5", method = RequestMethod.GET)
+    public ModelAndView greet5() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("greet5");
+        return mav;
+    }
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ModelAndView greet6() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("search");
+        return mav;
+    }
+    @RequestMapping(value = "/search1", method = RequestMethod.GET)
+    public ModelAndView greet61() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("search1");
+        return mav;
+    }
+
 
 
 
