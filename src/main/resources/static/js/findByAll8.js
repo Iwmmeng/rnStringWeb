@@ -16,6 +16,9 @@ $(function () {
         if (isEmpty(keyName)) {
             //todo 提示报错
             console.log("keyName is:" + keyName);
+            if((!isEmpty(productName)) && (isEmpty(fileName))){
+                urlLink = urlLink + "/onlyproduct";
+            }
         } else {
             if (isEmpty(fileName) && isEmpty(productName)) {
                 urlLink = urlLink + "";

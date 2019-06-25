@@ -59,26 +59,26 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.6.2</version>
-		</dependency>
-		<dependency>     <!-- 桥接：告诉Slf4j使用Log4j2 -->
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>2.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId> <!-- 桥接：log4j1使用Log4j2 也支持其他实现到log4j的桥接，引入不同的jar包即可-->
-			<artifactId>log4j-over-slf4j</artifactId>
-			<version>1.7.12</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.apache.logging.log4j</groupId>-->
+			<!--<artifactId>log4j-core</artifactId>-->
+			<!--<version>2.6.2</version>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>org.apache.logging.log4j</groupId>-->
+			<!--<artifactId>log4j-api</artifactId>-->
+			<!--<version>2.6.2</version>-->
+		<!--</dependency>-->
+		<!--<dependency>     &lt;!&ndash; 桥接：告诉Slf4j使用Log4j2 &ndash;&gt;-->
+			<!--<groupId>org.apache.logging.log4j</groupId>-->
+			<!--<artifactId>log4j-slf4j-impl</artifactId>-->
+			<!--<version>2.6.2</version>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>org.slf4j</groupId> &lt;!&ndash; 桥接：log4j1使用Log4j2 也支持其他实现到log4j的桥接，引入不同的jar包即可&ndash;&gt;-->
+			<!--<artifactId>log4j-over-slf4j</artifactId>-->
+			<!--<version>1.7.12</version>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>

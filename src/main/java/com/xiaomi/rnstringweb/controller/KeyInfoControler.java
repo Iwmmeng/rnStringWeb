@@ -97,8 +97,8 @@ public class KeyInfoControler {
 //                        product = "一个文件含多组base产品";
                             stringsMap = StringsHelper.parseStringBaseToMap(fileStringResult);
 //                        ExportExcelHelper.exportExcel(response,fileName,stringsMap);
-                            List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
-                            resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
+//                            List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
+//                            resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
                         } else {
                             //一个文件夹下多组产品的逻辑
 //                        product = "多个文件产品";
@@ -146,7 +146,7 @@ public class KeyInfoControler {
                     List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
                     resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
                 } else {
-                    logger.error("文件不存在，请重新输入！");
+                    logger.error("文件类型不匹配或者不存在，请重新输入！");
                 }
                 File reportFile = new File(basePath);
                 List<File> reportFileList = new ArrayList<>();
@@ -178,6 +178,13 @@ public class KeyInfoControler {
         logger.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
+    @RequestMapping(value = "/info/onlyproduct", method = RequestMethod.GET)
+    public List<KeyInfo> getInfoByProduct(@RequestParam(value = "product") String product) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByProduct(product);
+        logger.info("keyInfo {}", keyInfoList);
+        return keyInfoList;
+    }
+
 
     @RequestMapping(value = "/info/fileName", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByKeyNameAndFileName(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "fileName") String fileName) {

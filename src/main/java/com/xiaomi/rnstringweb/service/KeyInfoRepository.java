@@ -16,6 +16,7 @@ public interface KeyInfoRepository extends JpaRepository<KeyInfo,Integer>{
     List<KeyInfo> findByKeyNameAndProduct(String keyName,String product);
     List<KeyInfo> findByKeyNameAndProductAndFileName(String keyName,String product,String fileName);
     List<KeyInfo>findByKeyNameAndFileName(String keyName,String fileName);
+    List<KeyInfo>findByProduct(String product);
 
     @Query(value="select distinct product from KeyInfo")
     List<String> findProductList();
