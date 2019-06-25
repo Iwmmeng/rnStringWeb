@@ -36,7 +36,7 @@ import java.util.Map;
 
 @RestController
 public class KeyInfoControler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeyInfoControler.class);
+    Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private KeyInfoRepository keyInfoRepository;
     @Autowired
@@ -58,124 +58,138 @@ public class KeyInfoControler {
     //todo 1. 每次上传的都是同一产品的文件 2.product 的命名  3.HttpServletResponse response 这个要怎么使用？？？
     //上传上来的文件，做处理
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam(value = "file") MultipartFile file[], @RequestParam(value = "product") String product,HttpServletResponse response) throws Exception {
+    public String upload(@RequestParam(value = "file") MultipartFile file[], @RequestParam(value = "product") String product, HttpServletResponse response) throws Exception {
         Map<String, JSONObject> stringsMap = new HashMap<String, JSONObject>();
         Map<String, HashMap<String, JSONObject>> failResultsOfAllMaps = new HashMap<String, HashMap<String, JSONObject>>();
-        String basePath = ExportExcelHelper.createReportDir()+"/";
-
-        System.out.println("basePath"+basePath);
+        String basePath = ExportExcelHelper.createReportDir() + "/";
+        logger.info("basePath is:{}", basePath);
         String resultPath = basePath + "result.xlsx";
-        System.out.println(resultPath);
+        logger.info("resultPath is:{}", resultPath);
         String failResultPath = basePath + "failResult.txt";
-        System.out.println(failResultPath);
+        logger.info("failResultPath is:{}", failResultPath);
         String fileName = "";
 //        String product = "";
         if (file.length != 0) {
             for (int i = 0; i < file.length; i++) {
                 fileName = file[i].getOriginalFilename();
-                LOGGER.info("fileName is {},in the {} place of {} size", fileName, i, file.length);
+                if (!fileName.endsWith("js")) {
+                    continue;
+                }
+                logger.info("fileName is {},in the {} place of {} size", fileName, i, file.length);
                 String fileStringResult = StringsHelper.parseInputStreamToString(file[i].getInputStream());
-                //设置入口，按照文件名来设置
-                Boolean flag = StringUtils.containsAny(fileName, "EN.js", "TW.js", "DE.js", "ES.js", "IT.js", "ZH.js", "FR.js", "RU.js");
-                if (flag) {
-                    //空气净化器产品的入口（一个文件一个国家，不同文件的的key不一样，有多个文件）
+                try {
+                    //设置入口，按照文件名来设置
+                    Boolean flag = StringUtils.containsAny(fileName, "EN.js", "TW.js", "DE.js", "ES.js", "IT.js", "ZH.js", "FR.js", "RU.js");
+                    if (flag) {
+                        //空气净化器产品的入口（一个文件一个国家，不同文件的的key不一样，有多个文件）
 //                    product = "空气净化器pro";
-                    String countryCode;
-                    if (fileName.contains("TW")) {
-                        countryCode = "zh_Hant";
-                    } else {
-                        countryCode = fileName.substring(fileName.lastIndexOf("-"), fileName.indexOf(".js")).replace("-", "").toLowerCase();
-                    }
-                    JSONObject jb = StringsHelper.parseStringsToJson(fileStringResult);
-                    stringsMap.put(countryCode, jb);
-                } else {
-                    if (fileName.contains("String")) {
-                        //MHLocalizableString产品，一个文件里面有多组base，且每组的key都不太一致
-//                        product = "一个文件含多组base产品";
-                        stringsMap = StringsHelper.parseStringBaseToMap(fileStringResult);
-//                        ExportExcelHelper.exportExcel(response,fileName,stringsMap);
-                        List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
-                        resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
-                    } else {
-                        //一个文件夹下多组产品的逻辑
-//                        product = "多个文件产品";
-                        String zh = "zh";
-                        String en = "en";
-                        String outputPath = (basePath + fileName.replace(".js", ""));
-                        List<Map<String, JSONObject>> mapList = StringsHelper.getResultMapList(fileStringResult);
-                        //落盘所有普通数据
-                        if (mapList.size() > 1) {
-                            for (int k = 0; k < mapList.size(); k++) {
-                                Map<String, JSONObject> map = mapList.get(k);
-                                outputPath = outputPath + k + ".xlsx";
-                                ExportExcelHelper.fillExcelWithColor(map, fileName, outputPath);
-                                outputPath = basePath + fileName.replace(".js", "");
-                            }
+                        String countryCode;
+                        if (fileName.contains("TW")) {
+                            countryCode = "zh_Hant";
                         } else {
-                            outputPath += ".xlsx";
-                            ExportExcelHelper.fillExcelWithColor(mapList.get(0), fileName, outputPath);
+                            countryCode = fileName.substring(fileName.lastIndexOf("-"), fileName.indexOf(".js")).replace("-", "").toLowerCase();
                         }
-                        resultAnalyzeService.outputFailResult(failResultsOfAllMaps, mapList, fileName, outputPath, zh, en);
-                        for (Map<String, JSONObject> stringMap : mapList) {
-                            List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringMap, fileName, product);
+                        JSONObject jb = StringsHelper.parseStringsToJson(fileStringResult);
+                        stringsMap.put(countryCode, jb);
+                    } else {
+                        if (fileName.contains("String")) {
+                            //MHLocalizableString产品，一个文件里面有多组base，且每组的key都不太一致
+//                        product = "一个文件含多组base产品";
+                            stringsMap = StringsHelper.parseStringBaseToMap(fileStringResult);
+//                        ExportExcelHelper.exportExcel(response,fileName,stringsMap);
+                            List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
                             resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
+                        } else {
+                            //一个文件夹下多组产品的逻辑
+//                        product = "多个文件产品";
+                            String zh = "zh";
+                            String en = "en";
+                            String outputPath = (basePath + fileName.replace(".js", ""));
+                            List<Map<String, JSONObject>> mapList = StringsHelper.getResultMapList(fileStringResult);
+                            //落盘所有普通数据
+                            if (mapList.size() > 1) {
+                                for (int k = 0; k < mapList.size(); k++) {
+                                    Map<String, JSONObject> map = mapList.get(k);
+                                    outputPath = outputPath + k + ".xlsx";
+                                    ExportExcelHelper.fillExcelWithColor(map, fileName, outputPath);
+                                    outputPath = basePath + fileName.replace(".js", "");
+                                }
+                            } else {
+                                outputPath += ".xlsx";
+                                ExportExcelHelper.fillExcelWithColor(mapList.get(0), fileName, outputPath);
+                            }
+                            resultAnalyzeService.outputFailResult(failResultsOfAllMaps, mapList, fileName, outputPath, zh, en);
+                            for (Map<String, JSONObject> stringMap : mapList) {
+                                List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringMap, fileName, product);
+                                resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    logger.error("parse file exception",e);
                 }
             }
-            LOGGER.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> all all all  all all is finished <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> all all all  all all is finished <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             //针对多个localizedStrings 下多个文件的（一个文件里面包含多个国家）
-            if (failResultsOfAllMaps.size() != 0) {
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(failResultPath, false));
-                BufferedWriter writer0 = new BufferedWriter(outputStreamWriter);
-                for (Map.Entry<String, HashMap<String, JSONObject>> entry : failResultsOfAllMaps.entrySet()) {
-//                LOGGER.info("file is {},fail result is {}", entry.getKey(), entry.getValue());
-                    writer0.write(entry.getKey() + "," + entry.getValue());
-                    writer0.newLine();
-                    writer0.flush();
+            try {
+                if (failResultsOfAllMaps.size() != 0) {
+                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(failResultPath, false));
+                    BufferedWriter writer0 = new BufferedWriter(outputStreamWriter);
+                    for (Map.Entry<String, HashMap<String, JSONObject>> entry : failResultsOfAllMaps.entrySet()) {
+//                logger.info("file is {},fail result is {}", entry.getKey(), entry.getValue());
+                        writer0.write(entry.getKey() + "," + entry.getValue());
+                        writer0.newLine();
+                        writer0.flush();
+                    }
+                } else if (stringsMap.size() != 0) {
+                    ExportExcelHelper.fillExcelWithColor(stringsMap, "sheet", resultPath);
+                    List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
+                    resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
+                } else {
+                    logger.error("文件不存在，请重新输入！");
                 }
-            } else if (stringsMap.size() != 0) {
-                ExportExcelHelper.fillExcelWithColor(stringsMap, "sheet", resultPath);
-                List<JSONObject> jsonObjectList = resultAnalyzeService.pasreResultMapToJSONObject(stringsMap, fileName, product);
-                resultAnalyzeService.parseJSONObjectListToBean(jsonObjectList);
-            } else {
-                LOGGER.error("文件不存在，请重新输入！");
-            }
-            File reportFile =  new File(basePath);
-            List<File> reportFileList = new ArrayList<>();
+                File reportFile = new File(basePath);
+                List<File> reportFileList = new ArrayList<>();
 //            ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"xlsx","txt");
-            ExportExcelHelper.getAllDirsAndFiles(reportFileList,reportFile,"","");
-            ExportExcelHelper.downLoadFiles(reportFileList,response);
+                ExportExcelHelper.getAllDirsAndFiles(reportFileList, reportFile, "", "");
+                ExportExcelHelper.downLoadFiles(reportFileList, response);
 
-            return "process success!";
-        } else {
-            return ("input file is null ,try to upload again");
+                return "process success!";
+            } catch (Exception e) {
+                logger.error("save file exception,{}",e);
+                return "parse file exception "+e.getMessage()+";"+e.getCause()+e.getStackTrace();
+            }
+        }else{
+                return ("input file is null ,try to upload again");
+            }
         }
-    }
+
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByKeyName(@RequestParam(value = "keyName") String keyName) {
         List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyName(keyName);
-        LOGGER.info("keyInfo", keyInfoList);
+        logger.info("keyInfo", keyInfoList);
         return keyInfoList;
     }
 
     @RequestMapping(value = "/info/product", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByKeyNameAndProduct(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product) {
         List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProduct(keyName, product);
-        LOGGER.info("keyInfo {}", keyInfoList);
+        logger.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
+
     @RequestMapping(value = "/info/fileName", method = RequestMethod.GET)
-    public List<KeyInfo> getInfoByKeyNameAndFileName(@RequestParam(value = "keyName") String keyName,@RequestParam(value = "fileName") String fileName) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndFileName(keyName,fileName);
-        LOGGER.info("keyInfo {} ", keyInfoList);
+    public List<KeyInfo> getInfoByKeyNameAndFileName(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "fileName") String fileName) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndFileName(keyName, fileName);
+        logger.info("keyInfo {} ", keyInfoList);
         return keyInfoList;
     }
+
     @RequestMapping(value = "/info/all", method = RequestMethod.GET)
-    public List<KeyInfo> getInfoByAllParams(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product,@RequestParam(value = "fileName") String fileName) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, product,fileName);
-        LOGGER.info("keyInfo {} ", keyInfoList);
+    public List<KeyInfo> getInfoByAllParams(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product, @RequestParam(value = "fileName") String fileName) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, product, fileName);
+        logger.info("keyInfo {} ", keyInfoList);
         return keyInfoList;
     }
 
@@ -183,22 +197,19 @@ public class KeyInfoControler {
     @RequestMapping(value = "/info/productlist", method = RequestMethod.GET)
     public List<String> getProductList() {
         List<String> productList = keyInfoRepository.findProductList();
-        LOGGER.info("productList {}", productList);
+        logger.info("productList {}", productList);
         return productList;
     }
 //    @RequestMapping(value = "/info/columns", method = RequestMethod.GET)
 //    public List<String> getColumnsList() {
 //        List<String> columnsList = keyInfoRepository.getColumns();
-//        LOGGER.info("columnsList {}", columnsList);
+//        logger.info("columnsList {}", columnsList);
 //        return columnsList;
 //    }
 
 
-
-
-
     @RequestMapping(value = "/greet1", method = RequestMethod.GET)
-    public ModelAndView loginPage(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String productName,@RequestParam(value = "fileName") String fileName) {
+    public ModelAndView loginPage(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String productName, @RequestParam(value = "fileName") String fileName) {
 //        public String index(Model model){
         ModelAndView mav = new ModelAndView();
         mav.setViewName("greet1");
@@ -210,44 +221,40 @@ public class KeyInfoControler {
 //            return "greet";
     }
 
-        @RequestMapping(value = "/greet", method = RequestMethod.GET)
-        public ModelAndView greet() {
+    @RequestMapping(value = "/greet", method = RequestMethod.GET)
+    public ModelAndView greet() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("greet");
         return mav;
-        }
+    }
+
     @RequestMapping(value = "/greet2", method = RequestMethod.GET)
     public ModelAndView greet2() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("greet2");
         return mav;
     }
+
     @RequestMapping(value = "/greet5", method = RequestMethod.GET)
     public ModelAndView greet5() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("greet5");
         return mav;
     }
+
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView greet6() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("search");
         return mav;
     }
+
     @RequestMapping(value = "/search1", method = RequestMethod.GET)
     public ModelAndView greet61() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("search1");
         return mav;
     }
-
-
-
-
-
-
-
-
 
 
     @Test

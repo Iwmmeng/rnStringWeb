@@ -5,20 +5,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class StringsHelper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringsHelper.class);
-
+    private static Logger logger = LoggerFactory.getLogger(StringsHelper.class);
     public static String parseInputStreamToString(InputStream inputStream) throws IOException {
         String fileStringResult = null;
         InputStreamReader isReader = new InputStreamReader(inputStream, "UTF-8");
@@ -37,7 +34,7 @@ public class StringsHelper {
         }
         reader.close();
         fileStringResult = sb.toString();
-        LOGGER.info("get file StringResult: {}", fileStringResult);
+        logger.info("get file StringResult: {}", fileStringResult);
         return fileStringResult;
     }
 
@@ -52,12 +49,12 @@ public class StringsHelper {
                     String subConst = constStringArr[i].substring(constStringArr[i].indexOf("({"), constStringArr[i].indexOf("});")).replace("({", "").trim();
                     stringsList.add(subConst);
                 } else {
-                    LOGGER.info("the const str is not wanted: {}", constStringArr[i]);
+                    logger.info("the const str is not wanted: {}", constStringArr[i]);
                 }
             }
-            LOGGER.info("stringsList is {}", stringsList);
+            logger.info("stringsList is {}", stringsList);
         } else {
-            LOGGER.error("input strings is null");
+            logger.error("input strings is null");
         }
         return stringsList;
     }
@@ -78,13 +75,13 @@ public class StringsHelper {
                     zh_Hant = zh_Hant + "}";
                     zhHantList.add(zh_Hant);
                 } else {
-                    LOGGER.error("this const is not wanted");
+                    logger.error("this const is not wanted");
                 }
             }
-            LOGGER.info("zhHantList is {}", zhHantList);
+            logger.info("zhHantList is {}", zhHantList);
 
         } else {
-            LOGGER.error("input strings is null");
+            logger.error("input strings is null");
         }
         return zhHantList;
 
@@ -97,7 +94,7 @@ public class StringsHelper {
             int stringCount = StringUtils.countMatches(stringExport, "string");
             exportStringsMap.put("stringsExport", stringCount);
         }else {
-            LOGGER.error("input strings is null");
+            logger.error("input strings is null");
         }
         return exportStringsMap;
     }
@@ -121,15 +118,15 @@ public class StringsHelper {
                     String strPop = pop + "}";
                     originStrings = StringUtils.remove(originStrings, remove).trim();
                     foreignList.add(strPop);
-//                    LOGGER.info("leftString={}", originStrings);
+//                    logger.info("leftString={}", originStrings);
                 } else {
-                    LOGGER.info("stringsList is done");
+                    logger.info("stringsList is done");
                     break;
                 }
             }
-            LOGGER.info("foreignList is {}", foreignList);
+            logger.info("foreignList is {}", foreignList);
         } else {
-            LOGGER.info("originStrings is null");
+            logger.info("originStrings is null");
         }
         return foreignList;
     }
@@ -140,26 +137,26 @@ public class StringsHelper {
             for (int m = 0; m < foreignList.size(); m++) {
 //                JSONObject jsonObject = new JSONObject();
                 String foreignString = foreignList.get(m).toString();
-                LOGGER.info("foreignString is {}", foreignString);
+                logger.info("foreignString is {}", foreignString);
                 //取地域
                 String mapKey = foreignString.substring(0, foreignString.indexOf(":{")).replace("\"", "").trim();
                 String valueString = foreignString.substring(foreignString.indexOf(":{")).replaceFirst(":", "").trim();
-                LOGGER.info("valueString is {}", valueString);
+                logger.info("valueString is {}", valueString);
 //                JSONObject mapObject = JSONObject.parseObject(valueString);
                 JSONObject mapObject = new JSONObject(valueString);
                 stringsMap.put(mapKey, mapObject);
             }
         } else {
-            LOGGER.info("input List foreignList is null");
+            logger.info("input List foreignList is null");
         }
         if (zhHant != null) {
-            LOGGER.info("zhHant is {}",zhHant);
+            logger.info("zhHant is {}",zhHant);
             String key = zhHant.substring(zhHant.indexOf("zh_Hant"), zhHant.indexOf("=")).replace("\"", "").trim();
             String valueString = zhHant.substring(zhHant.indexOf("{")).trim();
             JSONObject jsonObject = new JSONObject(valueString);
             stringsMap.put(key, jsonObject);
         } else {
-            LOGGER.info("input zhHant string is null");
+            logger.info("input zhHant string is null");
         }
         return stringsMap;
     }
@@ -175,13 +172,13 @@ public class StringsHelper {
                 String strSub = stringsList.get(t).toString();
                 String zhHant = zhHantList.get(t).toString();
                 List foreignList = StringsHelper.parseStringToList(strSub);
-                LOGGER.info("zhHant is {}",zhHant);
-                LOGGER.info("foreignList is {}",foreignList);
+                logger.info("zhHant is {}",zhHant);
+                logger.info("foreignList is {}",foreignList);
                 StringsHelper.parseStringsToMap(foreignList, stringsMap, zhHant);
                 mapList.add(stringsMap);
             }
         } else {
-            LOGGER.error("文件的格式不对称");
+            logger.error("文件的格式不对称");
         }
         return mapList;
     }
@@ -196,7 +193,7 @@ public class StringsHelper {
 //                mapList.add(stringsMap);
 //            }
 //        } else {
-//            LOGGER.error("文件的格式不对称");
+//            logger.error("文件的格式不对称");
 //        }
 //    }
 
@@ -224,14 +221,14 @@ public class StringsHelper {
                     JSONObject baseObject = new JSONObject(baseMapValue);
                     stringMap.put(baseKey, baseObject);
                 } else {
-                    LOGGER.info("current str is not match");
+                    logger.info("current str is not match");
                 }
             } else {
-                LOGGER.info("this current str is null，continue");
+                logger.info("this current str is null，continue");
             }
         }
         for (Map.Entry<String, JSONObject> entry : stringMap.entrySet()) {
-            LOGGER.info("key is {},value is {}", entry.getKey(), entry.getValue());
+            logger.info("key is {},value is {}", entry.getKey(), entry.getValue());
         }
         return stringMap;
     }
@@ -244,7 +241,7 @@ public class StringsHelper {
                 start = StringUtils.removeEnd(start, ",");
             }
             start = start + "}";
-            LOGGER.info("jsonObject from string : {}", start);
+            logger.info("jsonObject from string : {}", start);
             JSONObject jsonObject = new JSONObject(start);
             //遍历这个文件的JSONObject，获取key值，存到keySet里面去
 //            Iterator iterator = jsonObject.keys();
@@ -254,7 +251,7 @@ public class StringsHelper {
 //            }
             return jsonObject;
         } else {
-            LOGGER.info("input string is invalid {}", fileStringResult);
+            logger.info("input string is invalid {}", fileStringResult);
         }
         return null;
     }

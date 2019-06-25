@@ -8,7 +8,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.util.ResourceUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -30,6 +30,7 @@ import java.util.zip.ZipOutputStream;
 import static org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND;
 
 public class ExportExcelHelper {
+    private static Logger logger = LoggerFactory.getLogger(ExportExcelHelper.class);
 
 //    public static void exportExcel(HttpServletResponse response, String fileName, Map<String, JSONObject> stringMap) throws Exception {
 //        // 告诉浏览器用什么软件可以打开此文件
@@ -39,7 +40,7 @@ public class ExportExcelHelper {
 //        fillExcelWithColor(stringMap, fileName,response.getOutputStream());
 //    }
 
-    public static void  fillExcelWithColor(Map<String, JSONObject> stringMap, String fileName, String outPath) throws IOException, JSONException {
+    public static void fillExcelWithColor(Map<String, JSONObject> stringMap, String fileName, String outPath) throws IOException, JSONException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(fileName);
         int ZH = -1;
@@ -85,25 +86,27 @@ public class ExportExcelHelper {
     }
 
 
-    public static List<File> getAllDirsAndFiles(List fileList, File file,String filter1,String filter2) {
+    public static List<File> getAllDirsAndFiles(List fileList, File file, String filter1, String filter2) {
         if (file.exists() && file.isFile()) {
             if (file.getName().endsWith(filter1) || file.getName().endsWith(filter2)) {
                 fileList.add(file);
             }
         } else {
             for (File sub : file.listFiles()) {
-                getAllDirsAndFiles(fileList, sub,filter1,filter2);
+                getAllDirsAndFiles(fileList, sub, filter1, filter2);
             }
         }
         return fileList;
     }
+
     public static HttpServletResponse downLoadFiles(List<File> files, HttpServletResponse response) throws Exception {
         try {
             // List<File> 作为参数传进来，就是把多个文件的路径放到一个list里面
             // 创建一个临时压缩文件
             // 临时文件可以放在CDEF盘中，但不建议这么做，因为需要先设置磁盘的访问权限，最好是放在服务器上，方法最后有删除临时文件的步骤
 //            String zipFilename = "D:/tempFile.zip";
-            String zipFilename = "/Users/huamiumiu/Miot/workCode/rnStringWeb/target/classes/static/report/resultFile.zip";
+            String zipFilename = "/root/rnString/static/report/resultFile.zip";
+//            String zipFilename = "/Users/huamiumiu/Miot/workCode/rnStringWeb/target/classes/static/report/resultFile.zip";
             File file = new File(zipFilename);
             file.createNewFile();
 //            if (!file.exists()) {
@@ -126,6 +129,7 @@ public class ExportExcelHelper {
         }
         return response;
     }
+
     public static void zipFile(List files, ZipOutputStream outputStream) {
         int size = files.size();
         for (int i = 0; i < size; i++) {
@@ -174,7 +178,7 @@ public class ExportExcelHelper {
         } else {
             try {
                 // 以流的形式下载文件。
-                System.out.println("file is "+file);
+                logger.info("file is:{}", file);
                 InputStream fis = new BufferedInputStream(new FileInputStream(file));
                 byte[] buffer = new byte[fis.available()];
                 fis.read(buffer);
@@ -187,7 +191,7 @@ public class ExportExcelHelper {
 
                 // 如果输出的是中文名的文件，在此处就要用URLEncoder.encode方法进行处理，+ new String(file.getName().getBytes("GB2312"), "ISO8859-1")
                 response.setHeader("Content-Disposition",
-                        "attachment;filename=tempFile.zip" );
+                        "attachment;filename=tempFile.zip");
                 response.addHeader("Access-Control-Allow-Origin", "*");
                 toClient.write(buffer);
                 toClient.flush();
@@ -205,21 +209,23 @@ public class ExportExcelHelper {
         }
         return response;
     }
+
     public static String createReportDir() throws FileNotFoundException {
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+//        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        File path = new File("/root/rnString");
         if (!path.exists()) {
             path = new File("");
         }
         File report = new File(path.getAbsolutePath(), "static/report/");
         if (!report.exists()) {
             report.mkdirs();
-        }else{
+        } else {
             Boolean isDelete = deleteDir(report);
-            System.out.println("delete report dir is: " + isDelete);
+            logger.info("delete report dir is:{}", isDelete);
             report.mkdirs();
-            System.out.println("create report dir again");
+            logger.info("create report dir again");
         }
-        System.out.println("report path is "+report);
+        logger.info("report path is:{}", report);
         return report.getAbsolutePath();
     }
 
@@ -227,7 +233,7 @@ public class ExportExcelHelper {
         if (dir.isDirectory()) {
             String[] children = dir.list();
             //递归删除目录中的子目录下
-            for (int i=0; i<children.length; i++) {
+            for (int i = 0; i < children.length; i++) {
                 boolean success = deleteDir(new File(dir, children[i]));
                 if (!success) {
                     return false;
@@ -275,17 +281,6 @@ public class ExportExcelHelper {
             System.out.println("----------file download" + filename);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

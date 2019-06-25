@@ -25,11 +25,11 @@ $(function () {
             console.log("keyName is:"+keyName);
         }else {
             if(isEmpty(fileName) && isEmpty(productName)){
-                urlLink = "http://10.234.22.110:9090/info";
+                urlLink = "http://10.38.163.192:9090/info";
             }else if((isEmpty(fileName)) && (!isEmpty(productName))){
-                urlLink="http://10.234.22.110:9090/info/product";
+                urlLink="http://10.38.163.192:9090/info/product";
             }else if((!isEmpty(fileName)) && (!isEmpty(productName))){
-                urlLink= "http://10.234.22.110:9090/info/fileName";
+                urlLink= "http://10.38.163.192:9090/info/fileName";
             }else {
                 //todo 提示报错
                 console.log("keyName is:"+keyName);

@@ -23,7 +23,7 @@
         var uploadFile = new FormData($("#file")[0]);
         if ("undefined" != typeof(uploadFile) && uploadFile != null && uploadFile != "") {
             $.ajax({
-                url: 'http://10.234.22.110:9090/upload',
+                url: 'http://10.38.163.192:9090/upload',
                 type: 'POST',
                 data: uploadFile,
                 async: false,
@@ -44,7 +44,7 @@
     }
 
     function downloadFile() {
-        var url = "http://10.234.22.110:9090/upload";
+        var url = "http://10.38.163.192:9090/upload";
         var $form = $("<form id='download' class='hidden' method='post'></form>");
         $form.attr("action", url);
         $('body').append($form);

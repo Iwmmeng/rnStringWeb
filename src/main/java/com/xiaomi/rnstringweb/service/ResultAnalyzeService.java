@@ -25,7 +25,8 @@ public class ResultAnalyzeService {
     @Autowired
     private ResultAnalyzeService resultAnalyzeService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResultAnalyzeService.class);
+    Logger logger = LoggerFactory.getLogger(getClass());
+//    private static final Logger LOGGER = LoggerFactory.getLogger(ResultAnalyzeService.class);
     /**
      * input map: <"en":{"key1":"value1"}>
      * output JSONObject: {"id":NULL,"keyName":"jsonKey1","en":"value1"}
@@ -66,14 +67,14 @@ public class ResultAnalyzeService {
             }
             jsonObjectList.add(object);
         }
-        LOGGER.info("jsonObjectList is {}",jsonObjectList);
+        logger.info("jsonObjectList is {}",jsonObjectList);
         return jsonObjectList;
     }
     public void parseJSONObjectListToBean(List<JSONObject> jsonObjectList) throws JSONException {
 //        List<KeyInfo> keyInfoList = new ArrayList<>();
         for(JSONObject jb : jsonObjectList){
             KeyInfo keyInfo = new KeyInfo();
-            LOGGER.info("current jsonObject is {},in the {} place  of {} size",jb,jsonObjectList.indexOf(jb),jsonObjectList.size());
+            logger.info("current jsonObject is {},in the {} place  of {} size",jb,jsonObjectList.indexOf(jb),jsonObjectList.size());
 //            KeyInfo keyInfo =  JSON.parseObject(jb.toJSONString(),KeyInfo.class);
             keyInfo.setDe(jb.getString("de"));
             keyInfo.setEn(jb.getString("en"));
@@ -101,7 +102,7 @@ public class ResultAnalyzeService {
 //            LOGGER.info("getProduct is {}",keyInfo.getProduct());
 //            LOGGER.info("zh is {}",keyInfo.getZh());
 //            LOGGER.info("getZh_Hant is {}",keyInfo.getZh_Hant());
-            LOGGER.info("keyInfo is {}",keyInfo.toString());
+            logger.info("keyInfo is {}",keyInfo.toString());
             keyInfoRepository.saveAndFlush(keyInfo);
         }
 
@@ -124,7 +125,7 @@ public class ResultAnalyzeService {
             //把jsonKey给设置进去，方便输出到文件
             jsonValueList.add(0, jsonKeyList.get(m));
             jsonValueListOutput.add(jsonValueList);
-            LOGGER.info("jsonValueList size {},list is {}", jsonValueList.size(), jsonValueList);
+            logger.info("jsonValueList size {},list is {}", jsonValueList.size(), jsonValueList);
         }
         return jsonValueListOutput;
     }
@@ -175,7 +176,7 @@ public class ResultAnalyzeService {
         if (failResultMap.size() != 0) {
             failResultsOfAllMaps.put(fileName, (HashMap<String, JSONObject>) failResultMap);
         } else {
-            LOGGER.info("failResultMap is null,no need to put in failResultsOfAllMaps ");
+            logger.info("failResultMap is null,no need to put in failResultsOfAllMaps ");
         }
     }
     //获取结果的入口
@@ -184,12 +185,12 @@ public class ResultAnalyzeService {
         if (mapList.size() != 0) {
             for (int mapNum = 0; mapNum < mapList.size(); mapNum++) {
                 failResultMap = new HashMap<String, JSONObject>();
-                LOGGER.info("###################### 第 {} 个map,total is {} #####################", mapNum + 1, mapList.size());
-                LOGGER.info("mapList.get(mapNum) is {}", mapList.get(mapNum));
+                logger.info("###################### 第 {} 个map,total is {} #####################", mapNum + 1, mapList.size());
+                logger.info("mapList.get(mapNum) is {}", mapList.get(mapNum));
                 resultAnalyzeService.analyseMapResult(mapList.get(mapNum), failResultMap, allOutputPath, zh, en);
             }
         } else {
-            LOGGER.info("mapList is null");
+            logger.info("mapList is null");
         }
         return failResultMap;
     }
@@ -200,7 +201,7 @@ public class ResultAnalyzeService {
         for (String key : map.keySet()) {
             mapKeyList.add(key);
         }
-        LOGGER.info("mapKeyList size is {},list is {}", mapKeyList.size(), mapKeyList);
+        logger.info("mapKeyList size is {},list is {}", mapKeyList.size(), mapKeyList);
         //校验各个JSONObject的长度都是一致的  done
         //提取一组JSONObject的key
         List jsonKeyList = new ArrayList();
@@ -211,19 +212,19 @@ public class ResultAnalyzeService {
             String jsonKey = (String) iterator.next();
             jsonKeyList.add(jsonKey);
         }
-        LOGGER.info("jsonKeyList size is {},list is {}", jsonKeyList.size(), jsonKeyList);
+        logger.info("jsonKeyList size is {},list is {}", jsonKeyList.size(), jsonKeyList);
         //对整体按照提取粗来的mapKey和jsonKey 来获取记录的值，表达出来
         jsonValueListOutput = getJsonValueList(jsonKeyList, map, mapKeyList, allOutputPath);
 
         int ZH = mapKeyList.indexOf(zh);
         int EN = mapKeyList.indexOf(en);
-        LOGGER.info("ZH is {},EN is {}", ZH, EN);
+        logger.info("ZH is {},EN is {}", ZH, EN);
         getFailResultMap(jsonValueListOutput, ZH, EN, mapKeyList, failResultMap);
     }
     public void getFailResultMap(List<List<String>> jsonValueListOutput, int ZH, int EN, List mapKeyList, Map<String, JSONObject> failResultMap) throws JSONException {
 //        Map<String, JSONObject> failResultMap = new HashMap<String, JSONObject>();
         for (int nc = 0; nc < jsonValueListOutput.size(); nc++) {
-            LOGGER.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>start to parse 第 {} 个 jsonKey，total is {}，jsonKey is {} ", nc + 1, jsonValueListOutput.size(), jsonValueListOutput.get(nc).get(0).toString());
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>start to parse 第 {} 个 jsonKey，total is {}，jsonKey is {} ", nc + 1, jsonValueListOutput.size(), jsonValueListOutput.get(nc).get(0).toString());
             List jsonValueList = jsonValueListOutput.get(nc);
             //需要从第一位开始，第0位是jsonKey
             for (int jc = 1; jc < jsonValueList.size(); jc++) {
@@ -236,12 +237,12 @@ public class ResultAnalyzeService {
                         //mapKeyList 比jsonValueList size少1
                         failResultMap.put(mapKeyList.get(jc - 1).toString(), failJsonObject);
                     } else {
-                        LOGGER.info("good job,passed");
+                        logger.info("good job,passed");
                     }
                 }
             }
         }
-        LOGGER.info(">>>>>>>>>>>>>>>>>>>>>>> parse current file finish,fail 的结果为 {}<<<<<<<<<<<<<<<<<<<<<", failResultMap);
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>> parse current file finish,fail 的结果为 {}<<<<<<<<<<<<<<<<<<<<<", failResultMap);
     }
 
 

@@ -12,7 +12,7 @@ $(function () {
         console.log("keyName" + keyName)
         console.log("fileName" + fileName)
         console.log("productName" + productName)
-        var urlLink = "http://10.234.22.110:9090/info";
+        var urlLink = "http://10.38.163.192:9090/info";
         if (isEmpty(keyName)) {
             //todo 提示报错
             console.log("keyName is:" + keyName);
