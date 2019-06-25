@@ -19,6 +19,7 @@ $(function () {
             if((!isEmpty(productName)) && (isEmpty(fileName))){
                 urlLink = urlLink + "/onlyproduct";
             }
+            console.log(" keyName is null，urlLink is:" + urlLink);
         } else {
             if (isEmpty(fileName) && isEmpty(productName)) {
                 urlLink = urlLink + "";
