@@ -184,6 +184,13 @@ public class KeyInfoControler {
         logger.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
+    @RequestMapping(value = "/info/fileproduct", method = RequestMethod.GET)
+    public List<KeyInfo> getInfoByFilenameAndProductNoKeyname(@RequestParam(value = "fileName") String fileName,@RequestParam(value = "product") String product) {
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByFileNameAndProduct(fileName,product);
+        logger.info("keyInfo {}", keyInfoList);
+        return keyInfoList;
+    }
+
 
 
     @RequestMapping(value = "/info/fileName", method = RequestMethod.GET)

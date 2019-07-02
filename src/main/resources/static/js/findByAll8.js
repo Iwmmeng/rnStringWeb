@@ -18,6 +18,8 @@ $(function () {
             console.log("keyName is:" + keyName);
             if((!isEmpty(productName)) && (isEmpty(fileName))){
                 urlLink = urlLink + "/onlyproduct";
+            }else if((!isEmpty(productName)) && (!isEmpty(fileName))){
+                urlLink = urlLink + "/fileproduct";
             }
             console.log(" keyName is null，urlLink is:" + urlLink);
         } else {
