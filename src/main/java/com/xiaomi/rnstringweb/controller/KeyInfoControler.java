@@ -169,26 +169,26 @@ public class KeyInfoControler {
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByKeyName(@RequestParam(value = "keyName") String keyName) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyName(keyName);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameOrderByIdDesc(keyName);
         logger.info("keyInfo", keyInfoList);
         return keyInfoList;
     }
 
     @RequestMapping(value = "/info/product", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByKeyNameAndProduct(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProduct(keyName, product);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductOrderByIdDesc(keyName, product);
         logger.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
     @RequestMapping(value = "/info/onlyproduct", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByProduct(@RequestParam(value = "product") String product) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByProduct(product);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByProductOrderByIdDesc(product);
         logger.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
     @RequestMapping(value = "/info/fileproduct", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByFilenameAndProductNoKeyname(@RequestParam(value = "fileName") String fileName,@RequestParam(value = "product") String product) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByFileNameAndProduct(fileName,product);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByFileNameAndProductOrderByIdDesc(fileName,product);
         logger.info("keyInfo {}", keyInfoList);
         return keyInfoList;
     }
@@ -197,14 +197,14 @@ public class KeyInfoControler {
 
     @RequestMapping(value = "/info/fileName", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByKeyNameAndFileName(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "fileName") String fileName) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndFileName(keyName, fileName);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndFileNameOrderByIdDesc(keyName, fileName);
         logger.info("keyInfo {} ", keyInfoList);
         return keyInfoList;
     }
 
     @RequestMapping(value = "/info/all", method = RequestMethod.GET)
     public List<KeyInfo> getInfoByAllParams(@RequestParam(value = "keyName") String keyName, @RequestParam(value = "product") String product, @RequestParam(value = "fileName") String fileName) {
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, product, fileName);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileNameOrderByIdDesc(keyName, product, fileName);
         logger.info("keyInfo {} ", keyInfoList);
         return keyInfoList;
     }
@@ -229,7 +229,7 @@ public class KeyInfoControler {
 //        public String index(Model model){
         ModelAndView mav = new ModelAndView();
         mav.setViewName("greet1");
-        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileName(keyName, productName, fileName);
+        List<KeyInfo> keyInfoList = keyInfoRepository.findByKeyNameAndProductAndFileNameOrderByIdDesc(keyName, productName, fileName);
         mav.addObject("info", keyInfoList);
         return mav;
 //        Student students = ssi.findStudentById(201713140001);

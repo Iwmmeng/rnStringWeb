@@ -12,12 +12,12 @@ public interface KeyInfoRepository extends JpaRepository<KeyInfo,Integer>{
 //     KeyInfo getKeyInfoByKeyName(String keyName);
 //
 //    @Override
-    List<KeyInfo> findByKeyName(String keyName);
-    List<KeyInfo> findByKeyNameAndProduct(String keyName,String product);
-    List<KeyInfo> findByKeyNameAndProductAndFileName(String keyName,String product,String fileName);
-    List<KeyInfo>findByKeyNameAndFileName(String keyName,String fileName);
-    List<KeyInfo>findByProduct(String product);
-    List<KeyInfo>findByFileNameAndProduct(String fileName,String product);
+    List<KeyInfo> findByKeyNameOrderByIdDesc(String keyName);
+    List<KeyInfo> findByKeyNameAndProductOrderByIdDesc(String keyName,String product);
+    List<KeyInfo> findByKeyNameAndProductAndFileNameOrderByIdDesc(String keyName,String product,String fileName);
+    List<KeyInfo>findByKeyNameAndFileNameOrderByIdDesc(String keyName,String fileName);
+    List<KeyInfo>findByProductOrderByIdDesc(String product);
+    List<KeyInfo>findByFileNameAndProductOrderByIdDesc(String fileName,String product);
 
     @Query(value="select distinct product from KeyInfo")
     List<String> findProductList();
