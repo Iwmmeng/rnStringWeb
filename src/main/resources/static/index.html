@@ -12,6 +12,10 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
     <script src="/js/findByAll8.js"></script>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap-table.js"></script>
@@ -29,9 +33,12 @@
       <div class="input-group-prepend">
           <span class="input-group-text">请输入产品名字</span>
       </div>
-      <input type="text" class="form-control" id="product_name" placeholder="product_name"/>
-      <input type="button" class="btn btn-info" onclick="UpladFile()" value="上传"/>
+      <input type="text" class="form-control" id="product_name" placeholder="产品名"/>
+      <input type="submit" class="btn btn-info" onclick="UpladFile()" value="上传" id="upload"/>
   </div>
+  <script>
+
+  </script>
 
   <h1></h1>
   <h1></h1>
@@ -92,6 +99,14 @@
         console.log(e);
     }
 
+//    var fileObj = document.getElementById("file").files; // js 获取文件对象
+//    var fileSize = fileObj.length;
+//    var productName = document.getElementById("product_name").value;
+
+    //设置置灰按钮
+    document.getElementById("upload").setAttribute("disabled", "disabled");
+
+
     //上传文件方法
     function UpladFile () {
         var xhr = new XMLHttpRequest();  // XMLHttpRequest 对象;
@@ -99,7 +114,12 @@
         var fileObj = document.getElementById("file").files; // js 获取文件对象
         var fileSize = fileObj.length;
         var file;
-        var productName = document.getElementById("product_name").value;
+        var productName = document.getElementById("product_name").value.trim();
+        if(fileSize!=0 && productName.size()!=0 && productName.indexOf("product_name")>-1){
+            document.getElementById("upload").removeAttribute("disabled");
+        }else {
+            alert("请上传文件和输入产品名")
+        }
         for (var i = 0; i < fileSize; i++) {
             file = fileObj[i];
             formData.append("file", file); // 文件对象

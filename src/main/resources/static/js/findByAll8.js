@@ -33,6 +33,7 @@ $(function () {
                 urlLink = urlLink + "/fileName";
             } else {
                 //todo 提示报错
+
                 console.log("keyName is:" + keyName);
             }
             console.log("urlLink is " + urlLink)
