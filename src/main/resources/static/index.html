@@ -93,7 +93,7 @@
             url: "http://10.38.163.192:9090/info/productlist",
             success: function (productList) {
                 var option;
-                option = "<option>select productName</option><option>select productName</option>";
+                option = "<option>select productName</option>";
 
                 //循环，i为下标从0开始，n为集合中对应的第i个对象
                 $.each(productList, function (i, n) {
@@ -126,6 +126,7 @@
             file = fileObj[i];
             formData.append("file", file); // 文件对象
         }
+        var productName = document.getElementById("productName").value.trim();
         formData.append("product", productName);
 
         console.log("fileObj is  " + fileObj.size);
