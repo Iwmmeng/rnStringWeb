@@ -29,16 +29,13 @@
       <!--<div class="input-group-prepend">-->
           <!--<span class="input-group-text">请上传文件</span>-->
       <!--</div>-->
-      <input type="file" class="form-control" id="file" placeholder="请选择文件" multiple="multiple"/>
+      <input type="file" class="form-control" placeholder="请选择文件" multiple="multiple" id="file" onchange="validate()" />
       <div class="input-group-prepend">
-          <span class="input-group-text">请输入产品名字</span>
+          <span class="input-group-text">请输入产品名</span>
       </div>
-      <input type="text" class="form-control" id="product_name" placeholder="产品名"/>
-      <input type="submit" class="btn btn-info" onclick="UpladFile()" value="上传" id="upload"/>
+      <input type="text" class="form-control" placeholder="产品名" id="productName" oninput="validate()" />
+      <input type="submit" class="btn btn-info" value="上传" disabled id="upladFile" onclick="upladFile()" />
   </div>
-  <script>
-
-  </script>
 
   <h1></h1>
   <h1></h1>
@@ -51,9 +48,7 @@
       <input type="text" class="form-control" placeholder="Key Name" id="keyName">
       <input type="text" class="form-control" placeholder="File Name" id="fileName">
       <!--<input type="text" class="form-control" placeholder="Product Name" id="productName">-->
-      <select id="mySelect" onchange="selectChange()">
-          <option>select productName</option>
-      </select>
+      <select id="mySelect" onchange="selectChange()"></select>
       <input type="submit" class="btn btn-info" value="搜索" id="btSearch">
   </div>
 
@@ -70,17 +65,39 @@
   </div>
 </body>
 <script type="text/javascript">
+    // validate
+    function validate () {
+        var file = $("#file").val()
+        var productName = $("#productName").val()
+
+        if (file && productName) {
+          // 文件值和产品名非空，上传按钮可点
+          $('#upladFile').attr('disabled', false)
+        } else {
+          // 文件值或产品名空，上传按钮不可点
+          $('#upladFile').attr('disabled', true)
+        }
+    }
+
+    // selectChange
+    function selectChange () {
+        var value = $("#mySelect").val()
+
+        alert('选中值为：' + value)
+    }
+
+    // 访问后台去数据库查询select的选项
     function getProduct () {
         $.ajax({
             type: "get",
-            url: "http://10.38.163.192:9090/info/productlist",//访问后台去数据库查询select的选项
+            url: "http://10.38.163.192:9090/info/productlist",
             success: function (productList) {
                 var option;
-                option = "<option>select productName</option>";
+                option = "<option>select productName</option><option>select productName</option>";
 
                 //循环，i为下标从0开始，n为集合中对应的第i个对象
                 $.each(productList, function (i, n) {
-                  option += "<option>" + n + "</option>"
+                  option += "<option>" + n + "</option>";
                 });
 
                 // 将循环拼接的字符串插入第二个下拉列表
@@ -95,31 +112,16 @@
     // 获取 productNameList
     getProduct();
 
-    function selectChange (e) {
-        console.log(e);
-    }
-
-//    var fileObj = document.getElementById("file").files; // js 获取文件对象
-//    var fileSize = fileObj.length;
-//    var productName = document.getElementById("product_name").value;
-
-    //设置置灰按钮
-    document.getElementById("upload").setAttribute("disabled", "disabled");
-
-
-    //上传文件方法
-    function UpladFile () {
-        var xhr = new XMLHttpRequest();  // XMLHttpRequest 对象;
-        var formData = new FormData(); // FormData 对象
-        var fileObj = document.getElementById("file").files; // js 获取文件对象
+    // 上传文件方法
+    function upladFile () {
+        // XMLHttpRequest 对象
+        var xhr = new XMLHttpRequest();
+        // FormData 对象
+        var formData = new FormData();
+        // js 获取文件对象
+        var fileObj = document.getElementById("file").files;
         var fileSize = fileObj.length;
         var file;
-        var productName = document.getElementById("product_name").value.trim();
-        if(fileSize!=0 && productName.size()!=0 && productName.indexOf("product_name")>-1){
-            document.getElementById("upload").removeAttribute("disabled");
-        }else {
-            alert("请上传文件和输入产品名")
-        }
         for (var i = 0; i < fileSize; i++) {
             file = fileObj[i];
             formData.append("file", file); // 文件对象
@@ -142,19 +144,18 @@
         xhr.onload = function (oEvent) {
             console.log("===upload complete===");
 
+            // 下载文件
             var content = xhr.response;
             var elink = document.createElement('a');
             elink.download = "resultFile.zip";
             elink.style.display = 'none';
             var blob = new Blob([content]);
             elink.href = URL.createObjectURL(blob);
-
             document.body.appendChild(elink);
             elink.click();
-
             document.body.removeChild(elink);
 
-            // 更新 Products
+            // 重新获取 productNameList
             getProduct();
         };
     }
