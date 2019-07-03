@@ -59,6 +59,8 @@ public class KeyInfoControler {
     //上传上来的文件，做处理
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(@RequestParam(value = "file") MultipartFile file[], @RequestParam(value = "product") String product, HttpServletResponse response) throws Exception {
+        logger.info("product name is: {}",product);
+        logger.info("file is:{},length is:{}",file,file.length);
         Map<String, JSONObject> stringsMap = new HashMap<String, JSONObject>();
         Map<String, HashMap<String, JSONObject>> failResultsOfAllMaps = new HashMap<String, HashMap<String, JSONObject>>();
         String basePath = ExportExcelHelper.createReportDir() + "/";

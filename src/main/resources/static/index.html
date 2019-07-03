@@ -81,9 +81,10 @@
 
     // selectChange
     function selectChange () {
-        var value = $("#mySelect").val()
+        var value = $("#mySelect").val();
+        console.log("value is "+value);
 
-        alert('选中值为：' + value)
+//        alert('选中值为：' + value)
     }
 
     // 访问后台去数据库查询select的选项
@@ -99,7 +100,6 @@
                 $.each(productList, function (i, n) {
                   option += "<option>" + n + "</option>";
                 });
-
                 // 将循环拼接的字符串插入第二个下拉列表
                 $("#mySelect").html(option);
 
