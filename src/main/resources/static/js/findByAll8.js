@@ -33,12 +33,10 @@ $(function () {
                 urlLink = urlLink + "/fileName";
             } else {
                 //todo 提示报错
-
                 console.log("keyName is:" + keyName);
             }
             console.log("urlLink is " + urlLink)
         }
-
         $('#table').bootstrapTable('showLoading');
 
         $.ajax({
@@ -59,21 +57,16 @@ $(function () {
             success: function (data) {
                 // 返回的对象都是List<keyInfo>,对其进行遍历
                 console.log("data is: ", data);
-
                 var i, j;
-
-
-                console.log("json is : ", json);
-
                 var dynamicHeader = [];
-
                 var json = data[0];
+                console.log("json is : ", json);
                 for (var key in json) {
                     console.log("key: ", key);
-
                     dynamicHeader.push({
                         field: key,
-                        title: key
+                        title: key,
+                        sortable:true
                     });
                 }
 
@@ -97,15 +90,15 @@ $(function () {
                     // 初始化加载第一页
                     pageNumber: 1,
                     // 可供选择的每页行数
-                    pageList: "[25, 50, 100, All]",
+                    pageList: "[25, 50, 100]",
                     // 是否显示切换按钮
-                    showToggle: true,
+                    showToggle: false,
                     // 是否显示所有的列
                     showColumns: true,
                     // 是否显示导出按钮(下篇文章将会提到)
-                    showExport: true,
+                    showExport: false,
                     // 导出数据类型(下篇文章将会提到)
-                    exportDataType: "basic",
+                    // exportDataType: "basic",
                     // 是否显示分页
                     pagination: true,
                     // 是否启用全匹配搜索，否则为模糊搜索
@@ -120,10 +113,6 @@ $(function () {
             },
             error: function () {
               alert("查询错误！");
-
-              setTimeout(() => {
-                location.reload()
-              }, 1000)
             }
         })
     })
