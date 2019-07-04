@@ -12,7 +12,7 @@ $(function () {
         console.log("keyName" + keyName)
         console.log("fileName" + fileName)
         console.log("productName" + productName)
-        var urlLink = "http://10.38.163.192:9090/info";
+        var urlLink = "http://10.234.22.121:9090/info";
         if (isEmpty(keyName)) {
             //todo 提示报错
             console.log("keyName is:" + keyName);
@@ -51,7 +51,7 @@ $(function () {
             async: false,//是否异步请求
             success: function (data) {   //如果请求成功，返回数据。
                 //返回的对象都是List<keyInfo>,对其进行遍历
-                console.log("data is:" + data)
+                console.log("data is:" + data);
                 var i, j;
                 var json = data[0];
                 console.log("json is :" + json);
@@ -60,6 +60,9 @@ $(function () {
                 var keyColumns = [];
                 var tmp = 0;
                 var str = "";
+                for(var k=0;k<rowSize;k++){
+                    console.log("current data is"+data[k]);
+                }
                 for (var key in json) {
                     console.log("key" + key);
                     keyArray[tmp] = key;
@@ -68,32 +71,28 @@ $(function () {
                         field: "field" + tmp,
                         title: key
                     });
-                    str += "<th>" + key + "</th>";
-                    console.log("str is " + str);
                     tmp++;
                 }
-                str = "<tr>" + str + "</tr>";
-                console.log("total str is " + str);
-
-                var tbody = window.document.getElementById("tbody-result");
-                var thResult = document.getElementById('thead-result');
-                if (!thResult) {
-                    var el = document.createElement("thead");
-                    el.setAttribute("id", "thead-result");
-                    el.innerHTML = str;
-                    document.getElementById('table').insertBefore(el, document.getElementById('tbody-result'));
-                }
-                var columnSize = tmp;
-                var totalString = "";
-                for (i = 0; i < rowSize; i++) {
-                    var cellString = "";
-                    for (j = 0; j < columnSize; j++) {
-                        cellString += "<td>" + data[i][(keyArray[j])] + "</td>"
-                    }
-                    cellString = "<tr>" + cellString + "</tr>";
-                    totalString += cellString;
-                }
-                tbody.innerHTML = totalString;
+                $('#table').bootstrapTable({
+                    // data: data,
+                    toolbar: '#toolbar',
+                    cache: false,
+                    striped: true,
+                    sidePagination: "client",
+                    sortOrder: "desc",
+                    pageSize: 25,
+                    pageNumber: 1,
+                    pageList: "[25, 50, 100, All]",
+                    showToggle: true,
+                    showColumns: true,
+                    showExport: true,
+                    exportDataType: "basic",
+                    pagination: true,
+                    strictSearch: true,
+                    search: true,
+                    columns: keyColumns
+                });
+                $('#table').bootstrapTable("load",data);
             }
         })
     })

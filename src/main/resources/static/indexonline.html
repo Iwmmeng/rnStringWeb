@@ -52,9 +52,14 @@
 
 <script src="/js/jquery-3.4.1.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+
+<!-- <script src="/jquery-3.2.1.slim.min.js"></script> -->
+<!-- <script src="/js/popper.min.js"></script> -->
+
 <script src="/js/findByAll8.js"></script>
 <script src="/js/bootstrap-table.js"></script>
 <script src="/js/bootstrap-table-zh-CN.js"></script>
+
 <script type="text/javascript">
     // validate
     function validate () {
@@ -83,7 +88,7 @@
     function getProduct () {
         $.ajax({
             type: "get",
-            url: "http://10.234.22.121:9090/info/productlist",
+            url: "http://10.38.163.192:9090/info/productlist",
             success: function (productList) {
                 var option;
                 option = "<option>select productName</option>";
@@ -126,7 +131,7 @@
         console.log("===upload start===");
 
         // 接收上传文件的后台地址
-        var url = "http://10.234.22.121:9090/upload";
+        var url = "http://10.38.163.192:9090/upload";
         // 返回值类型为blob
         xhr.responseType = "blob";
         // post方式，url为服务器请求地址，true 该参数规定请求是否异步处理。
