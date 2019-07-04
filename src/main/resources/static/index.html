@@ -5,6 +5,7 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*" charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-table.min.css">
 </head>
 <body ms-controller="viewmodel">
   <h1></h1>
@@ -39,22 +40,28 @@
 
   <h3>查询结果</h3>
   <!--<p>通过添加 .table-striped 类，来设置条纹表格:</p>-->
-  <div class="tableArea ">
-      <table class="table table-striped" id="table" data-height="600">
-          <!--在此处填充表格数据-->
-          <!--<thead id="thead">-->
-          <!--</thead>-->
-          <tbody id="tbody-result">
-          </tbody>
+  <div class="tableArea">
+      <table class="table table-striped" id="table">
+
       </table>
   </div>
 </body>
 
+<!-- jquery -->
 <script src="/js/jquery-3.4.1.min.js"></script>
+
+<!-- popper -->
+<script src="/js/popper.min.js"></script>
+
+<!-- bootstrap -->
 <script src="/js/bootstrap.min.js"></script>
-<script src="/js/findByAll8.js"></script>
+
+<!-- bootstrap-table -->
 <script src="/js/bootstrap-table.js"></script>
 <script src="/js/bootstrap-table-zh-CN.js"></script>
+
+<script src="/js/findByAll8.js"></script>
+
 <script type="text/javascript">
     // validate
     function validate () {

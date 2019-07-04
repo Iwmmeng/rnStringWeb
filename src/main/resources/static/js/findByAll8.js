@@ -38,61 +38,92 @@ $(function () {
             }
             console.log("urlLink is " + urlLink)
         }
+
+        $('#table').bootstrapTable('showLoading');
+
         $.ajax({
-            url: urlLink,//后台请求的数据，用的是PHP
-            dataType: "json",//数据格式
-            data:
-                {
-                    keyName: keyName.trim(),
-                    fileName: fileName.trim(),
-                    product: productName.trim()
-                },
-            type: "get",//请求方式
-            async: false,//是否异步请求
-            success: function (data) {   //如果请求成功，返回数据。
-                //返回的对象都是List<keyInfo>,对其进行遍历
-                console.log("data is:" + data);
+            // 后台请求的数据，用的是PHP
+            url: urlLink,
+            // 数据格式
+            dataType: "json",
+            data: {
+                keyName: keyName.trim(),
+                fileName: fileName.trim(),
+                product: productName.trim()
+            },
+            // 请求方式
+            type: "get",
+            // 是否异步请求
+            async: false,
+            // 如果请求成功，返回数据
+            success: function (data) {
+                // 返回的对象都是List<keyInfo>,对其进行遍历
+                console.log("data is: ", data);
+
                 var i, j;
+
+
+                console.log("json is : ", json);
+
+                var dynamicHeader = [];
+
                 var json = data[0];
-                console.log("json is :" + json);
-                var rowSize = data.length;
-                var keyArray = new Array();
-                var keyColumns = [];
-                var tmp = 0;
-                var str = "";
-                for(var k=0;k<rowSize;k++){
-                    console.log("current data is"+data[k]);
-                }
                 for (var key in json) {
-                    console.log("key" + key);
-                    keyArray[tmp] = key;
-                    console.log("keyArray[i] is:" + tmp + "  " + keyArray[tmp]);
-                    keyColumns.push({
-                        field: "field" + tmp,
+                    console.log("key: ", key);
+
+                    dynamicHeader.push({
+                        field: key,
                         title: key
                     });
-                    tmp++;
                 }
-                $('#table').bootstrapTable({
-                    // data: data,
+
+                console.log(data, json, dynamicHeader);
+
+                $('#table').bootstrapTable('destroy').bootstrapTable({
+                    // 得到的json数据，会根据columns参数进行对应赋值配置
+                    data: data,
+                    // Bstable工具导航条
                     toolbar: '#toolbar',
+                    // 浏览器缓存，默认为true，设置为false避免页面刷新调用浏览器缓存
                     cache: false,
+                    // 是否显示行间隔色
                     striped: true,
+                    // 分页方式：client客户端分页，server服务端分页
                     sidePagination: "client",
+                    // 排序方式
                     sortOrder: "desc",
+                    // 每页记录行数
                     pageSize: 25,
+                    // 初始化加载第一页
                     pageNumber: 1,
+                    // 可供选择的每页行数
                     pageList: "[25, 50, 100, All]",
+                    // 是否显示切换按钮
                     showToggle: true,
+                    // 是否显示所有的列
                     showColumns: true,
+                    // 是否显示导出按钮(下篇文章将会提到)
                     showExport: true,
+                    // 导出数据类型(下篇文章将会提到)
                     exportDataType: "basic",
+                    // 是否显示分页
                     pagination: true,
+                    // 是否启用全匹配搜索，否则为模糊搜索
                     strictSearch: true,
+                    // 开启搜索
                     search: true,
-                    columns: keyColumns
+                    // 自定义所生成的动态表头放入，结合上述json数据，实现表格数据内容的构建
+                    columns: dynamicHeader
                 });
-                $('#table').bootstrapTable("load",data);
+
+                $('#table').bootstrapTable('hideLoading');
+            },
+            error: function () {
+              alert("查询错误！");
+
+              setTimeout(() => {
+                location.reload()
+              }, 1000)
             }
         })
     })
